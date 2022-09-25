@@ -1,6 +1,7 @@
 use std::convert::Infallible;
 use std::net::SocketAddr;
-use log::{debug, error};
+use log::debug;
+use hyper::{Method, StatusCode};
 use hyper::{Body, Request, Response, Server};
 use hyper::service::{make_service_fn, service_fn};
 
@@ -19,7 +20,7 @@ async fn main() {
     });
 
     let server = Server::bind(&addr).serve(make_svc);
-    debug!("Server start: {}", server.local_addr());
+    println!("Server start: {}", server.local_addr());
 
     // Run this server for... forever!
     if let Err(e) = server.await {
