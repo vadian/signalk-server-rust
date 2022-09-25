@@ -1,29 +1,70 @@
-use std::convert::Infallible;
+use axum::{
+    routing::{get, post},
+    http::StatusCode,
+    response::IntoResponse,
+    Json, Router,
+};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
-use log::debug;
-use hyper::{Method, StatusCode};
-use hyper::{Body, Request, Response, Server};
-use hyper::service::{make_service_fn, service_fn};
-
-async fn health_check(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
-    Ok(Response::new("SignalK Server OK".into()))
-}
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
+
+    let app = Router::new()
+        .route("/heartbeat", get(health_check))
+        .route("/update", post(update))
+        .route("/update", get(update_template));
+
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    // A `Service` is needed for every connection, so this
-    // creates one from our `hello_world` function.
-    let make_svc = make_service_fn(|_conn| async {
-        // service_fn converts our function into a `Service`
-        Ok::<_, Infallible>(service_fn(health_check))
-    });
+    tracing::debug!("listening on {}", addr);
+    
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
 
-    let server = Server::bind(&addr).serve(make_svc);
-    println!("Server start: {}", server.local_addr());
+async fn health_check() -> &'static str {
+    "SignalK Server OK"
+}
 
-    // Run this server for... forever!
-    if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
-    }
+async fn update(
+    Json(payload): Json<Update>
+) -> impl IntoResponse {
+    
+    //todo: save in db
+    
+    (StatusCode::CREATED, Json(payload.delta))
+}
+
+async fn update_template() -> impl IntoResponse {
+    let template = Update {
+        delta: Delta {
+            path: "/path/to".to_string(),
+            value: "new_value".to_string()
+        },
+        source: Source {
+            id: "source_identifier".to_string()
+        }
+    };
+
+    (StatusCode::OK, Json(template))
+}
+
+#[derive(Deserialize, Serialize)]
+struct Delta {
+    path: String,
+    value: String,
+}
+
+#[derive(Deserialize, Serialize)]
+struct Update{
+    delta: Delta,
+    source: Source,
+}
+
+#[derive(Deserialize, Serialize)]
+struct Source {
+    id: String,
 }
