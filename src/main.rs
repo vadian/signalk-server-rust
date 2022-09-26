@@ -5,7 +5,10 @@ use axum::{
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
-use std::net::SocketAddr;
+use std::{net::SocketAddr, ops::Add};
+use influxdb::{Client, Query, Timestamp, ReadQuery};
+use influxdb::InfluxDbWriteable;
+use chrono::{DateTime, Utc};
 
 #[tokio::main]
 async fn main() {
@@ -25,8 +28,18 @@ async fn main() {
         .unwrap();
 }
 
-async fn health_check() -> &'static str {
-    "SignalK Server OK"
+async fn health_check() -> impl IntoResponse {
+
+    let client = Client::new("http://localhost:8086", "default");
+
+    let foo = client.ping().await;
+    
+    let ret = match foo {
+        Ok(str) => (StatusCode::OK, Json(str)),
+        Err(err) => (StatusCode::EXPECTATION_FAILED, Json(("ERROR".to_string(), err.to_string()))),
+    };
+
+    return ret;
 }
 
 async fn update(
@@ -34,28 +47,31 @@ async fn update(
 ) -> impl IntoResponse {
     
     //todo: save in db
-    
-    (StatusCode::CREATED, Json(payload.delta))
+
+    (StatusCode::CREATED, Json(payload))
 }
 
 async fn update_template() -> impl IntoResponse {
     let template = Update {
         delta: Delta {
-            path: "/path/to".to_string(),
-            value: "new_value".to_string()
+            time: chrono::offset::Utc::now(),
+            path: String::from("/path/to"),
+            value: String::from("new_value")
         },
         source: Source {
-            id: "source_identifier".to_string()
+            id: String::from("source_identifier")
         }
     };
 
     (StatusCode::OK, Json(template))
 }
 
+#[derive(InfluxDbWriteable)]
 #[derive(Deserialize, Serialize)]
 struct Delta {
     path: String,
     value: String,
+    time: DateTime<Utc>,
 }
 
 #[derive(Deserialize, Serialize)]
