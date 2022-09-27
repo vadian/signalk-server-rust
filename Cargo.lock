@@ -807,10 +807,15 @@ dependencies = [
  "influxdb",
  "serde",
  "serde_json",
+ "signalk_spec",
  "tokio",
  "tracing",
  "tracing-subscriber",
 ]
+
+[[package]]
+name = "signalk_spec"
+version = "0.0.1"
 
 [[package]]
 name = "slab"
