@@ -4,8 +4,8 @@ use reqwest::get;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
-    //let result = heartbeat().await;
-    let result = update().await;
+    let result = heartbeat().await;
+    //let result = update().await;
 
     return match result {
         Ok(resp) => {
@@ -16,16 +16,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         Err(e) => {
             tracing::error!("Error: {}", e);
-            Err(e)
+            Err(e.into())
         }
     };
 }
 
-async fn heartbeat() -> Result<reqwest::Response, Box<dyn std::error::Error>> {
+async fn heartbeat() -> Result<reqwest::Response, reqwest::Error> {
     let resp = get("http://localhost:3000/heartbeat")
         .await?;
 
-    return Ok(resp);
+    return resp.error_for_status();
  }
 
  async fn update_template() -> Result<reqwest::Response, Box<dyn std::error::Error>> {
@@ -35,7 +35,7 @@ async fn heartbeat() -> Result<reqwest::Response, Box<dyn std::error::Error>> {
     return Ok(resp);
  }
 
- async fn update() -> Result<reqwest::Response, Box<dyn std::error::Error>> {
+ async fn update() -> Result<reqwest::Response, reqwest::Error> {
     let update = ::signalk_core::Update{        
         time: chrono::offset::Utc::now(),
         path: String::from("boat.name"),
@@ -49,5 +49,5 @@ async fn heartbeat() -> Result<reqwest::Response, Box<dyn std::error::Error>> {
         .send()
         .await?;
 
-    return Ok(resp);
+    return resp.error_for_status();
  }

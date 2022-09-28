@@ -52,9 +52,9 @@ async fn update(
 
     let foo = client.query(payload.into_query("signalk")).await;
 
-    match foo {
-        Ok(str) => (StatusCode::CREATED, Json(str)),
-        Err(e) => (StatusCode::BAD_REQUEST, Json(e.to_string()))
+    return match foo {
+        Ok(str) => (StatusCode::CREATED, str),
+        Err(e) => (StatusCode::BAD_REQUEST, e.to_string())
     };
 }
 
