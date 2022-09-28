@@ -46,21 +46,24 @@ async fn update(
     Json(payload): Json<Update>
 ) -> impl IntoResponse {
     
-    //todo: save in db
+    let client = Client::new("http://localhost:8086", "signalk_event")
+        .with_auth("admin", "password");
+    //let foo = client.with_auth("admin", "password");
 
-    (StatusCode::CREATED, Json(payload))
+    let foo = client.query(payload.into_query("signalk")).await;
+
+    match foo {
+        Ok(str) => (StatusCode::CREATED, Json(str)),
+        Err(e) => (StatusCode::BAD_REQUEST, Json(e.to_string()))
+    };
 }
 
 async fn update_template() -> impl IntoResponse {
     let template = Update {
-        delta: Delta {
-            time: chrono::offset::Utc::now(),
-            path: String::from("/path/to"),
-            value: String::from("new_value")
-        },
-        source: Source {
-            id: String::from("source_identifier")
-        }
+        time: chrono::offset::Utc::now(),
+        path: String::from("/path/to"),
+        value: String::from("new_value"),
+        source: String::from("source_identifier")
     };
 
     (StatusCode::OK, Json(template))
@@ -68,19 +71,9 @@ async fn update_template() -> impl IntoResponse {
 
 #[derive(InfluxDbWriteable)]
 #[derive(Deserialize, Serialize)]
-struct Delta {
-    path: String,
-    value: String,
-    time: DateTime<Utc>,
-}
-
-#[derive(Deserialize, Serialize)]
 struct Update{
-    delta: Delta,
-    source: Source,
-}
-
-#[derive(Deserialize, Serialize)]
-struct Source {
-    id: String,
+    time: DateTime<Utc>,
+    #[influxdb(tag)] path: String,
+    source: String,
+    value: String,
 }

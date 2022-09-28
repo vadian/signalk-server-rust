@@ -816,6 +816,12 @@ dependencies = [
 [[package]]
 name = "signalk_core"
 version = "0.0.1"
+dependencies = [
+ "chrono",
+ "influxdb",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "slab"
