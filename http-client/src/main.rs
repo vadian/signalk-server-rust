@@ -4,8 +4,8 @@ use reqwest::get;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
-    let result = heartbeat().await;
-    //let result = update().await;
+    //let result = heartbeat().await;
+    let result = update().await;
 
     return match result {
         Ok(resp) => {
@@ -16,6 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         Err(e) => {
             tracing::error!("Error: {}", e);
+//            tracing::error!("Contents: {}", e.text().await?);
             Err(e.into())
         }
     };
