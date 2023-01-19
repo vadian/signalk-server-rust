@@ -1,13 +1,13 @@
 use axum::{
+    extract,
     routing::{get, post},
     http::StatusCode,
     response::IntoResponse,
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
-use tracing_subscriber::registry::Data;
-use std::{net::SocketAddr, ops::Add};
-use influxdb2::{Client, FromDataPoint, models::DataPoint};
+use std::net::SocketAddr;
+use influxdb2::{Client, FromDataPoint, models::{DataPoint, Status}};
 use influxdb2::models::Query;
 use chrono::{DateTime, Utc, FixedOffset, TimeZone};
 
@@ -18,7 +18,8 @@ async fn main() {
     let app = Router::new()
         .route("/heartbeat", get(health_check))
         .route("/update", post(update))
-        .route("/update", get(update_template));
+        .route("/update", get(update_template))
+        .route("/query/:query", get(query));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     tracing::debug!("listening on {}", addr);
@@ -48,7 +49,6 @@ async fn update(
 ) -> impl IntoResponse {
     let token = "n6SbaAaX02RxTplLOFf2oB7079nxOkYlvKXmxlK35wcJ1w-TT1PxLqr0nuvGLa-ntZRvxhi4i0LduHLnD8AcEQ==";
     let client = Client::new("http://localhost:8086", "default", token);
-    //let foo = client.with_auth("admin", "password");
     let bucket = "signalk_events";
 
     let update = DataPoint::builder(payload.path)
@@ -67,6 +67,22 @@ async fn update(
         Ok(_) => (StatusCode::CREATED, "Update successful.".to_string()),
         Err(e) => (StatusCode::BAD_REQUEST, e.to_string())
     };
+}
+
+async fn query(extract::Path(req): extract::Path<String>) -> Result<Json<Vec<Update>>, StatusCode> {
+    let token = "n6SbaAaX02RxTplLOFf2oB7079nxOkYlvKXmxlK35wcJ1w-TT1PxLqr0nuvGLa-ntZRvxhi4i0LduHLnD8AcEQ==";
+    let client = Client::new("http://localhost:8086", "default", token);
+    let bucket = "signalk_events";
+
+    let query = Query::new(req);
+    let res = client.query::<Update>(Some(query))
+        .await;
+
+    match res  {
+        Ok(v) => Result::Ok(Json(v)),
+        Err(e) => Result::Err(StatusCode::BAD_REQUEST)
+    }        
+
 }
 
 async fn update_template() -> impl IntoResponse {

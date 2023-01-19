@@ -5,7 +5,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
     //let result = heartbeat().await;
-    let result = update().await;
+    //let result = update().await;
+    let bucket = "signalk_events";
+
+    let q: String = format!("from(bucket: \"{}\") 
+    |> range(start: -1w)
+    |> filter(fn: (r) => r.path == \"{}\") 
+    |> last()
+    ", bucket, "http_client");
+
+    let result = query(q).await;
 
     return match result {
         Ok(resp) => {
@@ -16,7 +25,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
         Err(e) => {
             tracing::error!("Error: {}", e);
-//            tracing::error!("Contents: {}", e.text().await?);
             Err(e.into())
         }
     };
@@ -24,6 +32,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn heartbeat() -> Result<reqwest::Response, reqwest::Error> {
     let resp = get("http://localhost:3000/heartbeat")
+        .await?;
+
+    return resp.error_for_status();
+ }
+
+ async fn query(query: String) -> Result<reqwest::Response, reqwest::Error> {
+    let resp = get(format!("http://localhost:3000/query/{}", query))
         .await?;
 
     return resp.error_for_status();
