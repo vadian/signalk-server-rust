@@ -1,10 +1,5 @@
-use chrono::{DateTime, Utc};
-use influxdb::InfluxDbWriteable;
+use emseries::{Recordable, DateTimeTz};
 use serde::{Serialize, Deserialize};
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
 
 #[cfg(test)]
 mod tests {
@@ -12,16 +7,36 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = add(2, 2);
+        let result = 2 + 2;
         assert_eq!(result, 4);
     }
 }
 
-#[derive(InfluxDbWriteable)]
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Update{
-    pub time: DateTime<Utc>,
-    #[influxdb(tag)] pub path: String,
+    pub timestamp: DateTimeTz,
+    pub path: String,
     pub source: String,
     pub value: String,
+}
+
+
+impl Recordable for Update {
+    fn timestamp(&self) -> DateTimeTz {
+        self.timestamp.to_owned()
+    }
+    fn tags(&self) -> Vec<String> {
+        Vec::new()
+    }
+}
+
+impl Default for Update {
+    fn default() -> Self {
+        Self {
+            path: "".to_string(),
+            source: "".to_string(),
+            value: "".to_string(),
+            timestamp: DateTimeTz(chrono::Utc::now().with_timezone(&chrono_tz::UTC)),
+        }
+    }
 }

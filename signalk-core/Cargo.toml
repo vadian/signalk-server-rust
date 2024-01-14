@@ -8,5 +8,8 @@ edition = "2021"
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.68"
-influxdb = { version = "0.5.2", features = ["derive"] }
 chrono = "0.4.22"
+chrono-tz = "0.4.1"
+
+
+emseries = { path = "../../../emseries" } 

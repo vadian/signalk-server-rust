@@ -15,6 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ", bucket, "http_client");
 
     let result = query(q).await;
+    //let result = update().await;
 
     return match result {
         Ok(resp) => {
