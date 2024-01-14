@@ -151,9 +151,9 @@ dependencies = [
 
 [[package]]
 name = "dimensioned"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2517b0555262aeeda0d107a40ecfbbcf185921180ffb4acf316ebe0887467e26"
+checksum = "a0b0a86c5d31c93238ff4b694fa31f3acdf67440770dc314c57d90e433914397"
 dependencies = [
  "generic-array",
  "num-traits",
@@ -200,11 +200,12 @@ checksum = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
 
 [[package]]
 name = "generic-array"
-version = "0.11.2"
+version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "667f6ea017b297ec65b8a108c6e9ad6879460721fb3b6b23abf690970147fc28"
+checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
+ "version_check",
 ]
 
 [[package]]
@@ -574,6 +575,12 @@ dependencies = [
  "rand",
  "serde",
 ]
+
+[[package]]
+name = "version_check"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 
 [[package]]
 name = "wasi"

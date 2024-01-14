@@ -15,6 +15,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 num-traits = "0.2"
 chrono = "0.4.22"
 futures = { version = "0.3", default-features = false }
+chrono-tz = "0.4.1"
 
 signalk_core = {path = "signalk-core" }
 emseries = { path = "../../emseries" } 

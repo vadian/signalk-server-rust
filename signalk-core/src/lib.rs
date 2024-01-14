@@ -1,4 +1,4 @@
-use emseries::{Recordable, DateTimeTz};
+pub use emseries::{Recordable, DateTimeTz};
 use serde::{Serialize, Deserialize};
 
 #[cfg(test)]

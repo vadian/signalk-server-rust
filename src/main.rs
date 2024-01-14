@@ -11,6 +11,7 @@ use emseries::{DateTimeTz, Record, Series};
 use signalk_core::Update;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use chrono_tz;
 
 static FILE: &str = ".\\db.series.ndjson";
 
@@ -61,8 +62,9 @@ async fn update(
 
 async fn query(
     State(state): State<Arc<Mutex<Series<Update>>>>,
-    extract::Path(_req): extract::Path<String>,
+    extract::Path(req): extract::Path<String>,
 ) -> Result<Json<Vec<Record<Update>>>, StatusCode> {
+    println!("Request: {}", req);
     let res = state.lock().await.all_records();
 
     match res {
@@ -76,8 +78,12 @@ async fn update_template() -> impl IntoResponse {
         path: String::from("/path/to"),
         value: String::from("new_value"),
         source: String::from("source_identifier"),
-        timestamp: DateTimeTz::utc_now(),
+        timestamp: utc_now(),
     };
 
     (StatusCode::OK, Json(template))
+}
+
+pub fn utc_now() -> DateTimeTz {
+    DateTimeTz(chrono::Utc::now().with_timezone(&chrono_tz::UTC))
 }

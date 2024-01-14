@@ -205,9 +205,9 @@ checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
 
 [[package]]
 name = "dimensioned"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2517b0555262aeeda0d107a40ecfbbcf185921180ffb4acf316ebe0887467e26"
+checksum = "a0b0a86c5d31c93238ff4b694fa31f3acdf67440770dc314c57d90e433914397"
 dependencies = [
  "generic-array",
  "num-traits",
@@ -329,11 +329,12 @@ dependencies = [
 
 [[package]]
 name = "generic-array"
-version = "0.11.2"
+version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "667f6ea017b297ec65b8a108c6e9ad6879460721fb3b6b23abf690970147fc28"
+checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
+ "version_check",
 ]
 
 [[package]]
@@ -924,6 +925,7 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "chrono",
+ "chrono-tz",
  "emseries",
  "futures",
  "num-traits",
@@ -1216,6 +1218,12 @@ name = "valuable"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
+
+[[package]]
+name = "version_check"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 
 [[package]]
 name = "wasi"
